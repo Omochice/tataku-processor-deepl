@@ -7,7 +7,7 @@ import {
   $string,
   access,
   type Infer,
-} from "https://esm.sh/lizod@0.2.4";
+} from "https://esm.sh/lizod@0.2.6/";
 
 const endPoints = {
   pro: "https://api.deepl.com/v2/translate",

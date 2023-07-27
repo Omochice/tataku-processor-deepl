@@ -41,8 +41,6 @@ let g:tataku_recipes = #{
 
 ## Options 
 
-### `anyjump_definition`
-
 - `isPro` 
 
 Whether to use pro plan access point.

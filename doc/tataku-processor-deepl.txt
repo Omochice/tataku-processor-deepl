@@ -49,8 +49,6 @@ Configuration:
 Options ~
                                              *tataku-processor-deepl-Options*
 
-`anyjump_definition`~
-
 - `isPro` *tataku-processor-deepl-param-isPro*
 
 Whether to use pro plan access point.

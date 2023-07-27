@@ -1,0 +1,95 @@
+---
+name: tataku-processor-deepl
+description: deepl processor for tataku.vim
+--
+
+=pod
+
+=head1 tataku-processor-deepl X<tataku-processor-deepl>
+
+Deepl processor for tataku.vim.
+
+=head2 Contents X<tataku-processor-deepl-contents>
+
+=over 0
+
+=item * L<tataku-processor-deepl-installation|tataku-processor-deepl-installation>
+
+=item * L<tataku-processor-deepl-dependencies|tataku-processor-deepl-dependencies>
+
+=item * L<tataku-processor-deepl-examples|tataku-processor-deepl-examples>
+
+=item * L<tataku-processor-deepl-Options|tataku-processor-deepl-Options>
+
+=back
+
+=head2 Installation X<tataku-processor-deepl-installation>
+
+Use your favorite plugin manager or other.
+
+=head2 Dependencies X<tataku-processor-deepl-dependencies>
+
+tataku.vim and denops.vim are required.
+
+=over 0
+
+=item * https://github.com/Omochcie/tataku.vim
+
+=item * https://github.com/vim-denops/denops.vim
+
+=back
+
+=head2 Examples X<tataku-processor-deepl-examples>
+
+Configuration:
+
+=begin vim
+
+let g:tataku_recipes = #{
+    \   sample: #{
+    \     ...
+    \   },
+    \   processor: #{
+    \     name: 'deepl',
+    \     options: #{
+    \       source: 'en',
+    \       target: 'ja',
+    \     },
+    \   },
+		\   ...
+
+=end vim
+
+=head2 Options X<tataku-processor-deepl-Options>
+
+=head3 C<anyjump_definition>
+
+=over 0
+
+=item * C<isPro> X<tataku-processor-deepl-param-isPro>
+
+Whether to use pro plan access point.
+
+Default: C<false>
+
+=item * C<authKey> X<tataku-processor-deepl-param-authKey>
+
+Authentication key.
+
+Required.
+
+=item * C<source> X<tataku-processor-deepl-param-source>
+
+The source language name that translate text.
+
+Required.
+
+=item * C<source> X<tataku-processor-deepl-param-target>
+
+The target language name that translate text.
+
+Required.
+
+=back
+
+=cut

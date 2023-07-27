@@ -1,6 +1,7 @@
 name: Generate docs from pod
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -22,7 +23,7 @@ jobs:
         run: |
           git config user.name 'GitHub'
           git config user.email 'noreply@github.com'
-          git add README.md doc/ddu-source-anyjump.txt --force
+          git add README.md doc/tataku-processor-deepl.txt --force
           git commit -m "docs: Generate docs"
           git clean -fdx
       - name: Create Pull Request

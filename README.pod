@@ -62,8 +62,6 @@ let g:tataku_recipes = #{
 
 =head2 Options X<tataku-processor-deepl-Options>
 
-=head3 C<anyjump_definition>
-
 =over 0
 
 =item * C<isPro> X<tataku-processor-deepl-param-isPro>

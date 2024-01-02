@@ -97,7 +97,7 @@ const processor = (
         option.isPro ?? false,
       );
 
-      controller.enqueue(translateds.translations.map((e) => e.text));
+      controller.enqueue(translateds.translations.map((e) => `${e.text}\n`));
     },
   });
 };

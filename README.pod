@@ -56,7 +56,7 @@ let g:tataku_recipes = #{
     \       target: 'ja',
     \     },
     \   },
-		\   ...
+    \   ...
 
 =end vim
 

@@ -36,7 +36,7 @@ let g:tataku_recipes = #{
     \       target: 'ja',
     \     },
     \   },
-		\   ...
+    \   ...
 ```
 
 ## Options 

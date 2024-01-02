@@ -1,35 +1,47 @@
 name: Generate docs from pod
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - main
-    paths:
-      - "README.pod"
 
 jobs:
-  Run-deno-task-readme:
+  docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: denoland/setup-deno@v1
-        with:
-          deno-version: vx.x.x
-      - name: Check out repository code
-        uses: actions/checkout@v4
-      - name: Generate readme
-        run: deno task podeno
-      - name: Create commits
+      - uses: actions/checkout@v4
+      - name: Check is main protected
+        id: branchCheck
         run: |
-          git config user.name 'GitHub'
-          git config user.email 'noreply@github.com'
-          git add README.md doc/tataku-processor-deepl.txt --force
-          git commit -m "docs: Generate docs"
-          git clean -fdx
+          RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.token }}" \
+          "https://api.github.com/repos/${{ github.repository }}/branches/main")
+          PROTECTED=$(echo ${RESPONSE} | jq -r '.protected')
+          echo "${PROTECTED}"
+          echo "{isProtected}={${PROTECTED}}" >> $GITHUB_OUTPUT
+      - uses: Omochice/action-normalize-vim-plugin-name@v0.1.0
+        id: normalize
+        with:
+          trim-tail-dot-vim: true
+      - uses: Omochice/action-podeno@v0.1.0
+        with:
+          config: |
+            [
+              { type: "markdown", in: "README.pod", out: "README.md", },
+              { type: "vimdoc", in: "README.pod", out: "doc/${{ steps.normalize.outputs.normalizedName }}.txt", },
+            ]
+      - name: Remove deno.lock
+        run: test -f deno.lock && rm deno.lock || true
+      - name: Create auto commit
+        uses: stefanzweifel/git-auto-commit-action@v5
+        if: ${{ steps.branchCheck.outputs.isProtected != true }}
+        with:
+          commit_message: "docs: update docs"
+          branch: ${{ github.head_ref }}
       - name: Create Pull Request
+        if: ${{ steps.branchCheck.outputs.isProtected == true }}
         uses: peter-evans/create-pull-request@v5
         with:
-          title: ":robot: Update docs"
+          title: "docs: update docs"
           body: |
             This PR is created by [create-pull-request](https://github.com/peter-evans/create-pull-request).
             The docs are generated automaticaly.

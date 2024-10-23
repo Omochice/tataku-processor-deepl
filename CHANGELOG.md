@@ -1,0 +1,18 @@
+# Changelog
+
+## 1.0.0 (2024-10-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* add breaking line ([#13](https://github.com/Omochice/tataku-processor-deepl/issues/13))
+
+### Features
+
+* add breaking line ([#13](https://github.com/Omochice/tataku-processor-deepl/issues/13)) ([b6776a4](https://github.com/Omochice/tataku-processor-deepl/commit/b6776a4ffb29ab156793022e7a1978f967634c88))
+* Apply stream api ([f1eede8](https://github.com/Omochice/tataku-processor-deepl/commit/f1eede82838ac947aa4bd8c702d36816bb3be44d))
+
+
+### Bug Fixes
+
+* fix job to generate docs ([7154591](https://github.com/Omochice/tataku-processor-deepl/commit/7154591450ec96000e20f23ef22422d16881bec4))

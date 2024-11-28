@@ -1,4 +1,4 @@
-import { Denops } from "jsr:@denops/std@7.3.2";
+import { Denops } from "jsr:@denops/std@7.4.0";
 import {
   $array,
   $boolean,

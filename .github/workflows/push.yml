@@ -1,48 +1,126 @@
-name: Checks for push
+name: Check codes
 
-on: push
+on:
+  push: null
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch: null
 
 jobs:
   path-filter:
+    timeout-minutes: 5
     outputs:
-      markdown: ${{steps.changes.outputs.markdown}}
+      # keep-sorted start
       actions: ${{steps.changes.outputs.actions}}
-      ts: ${{steps.changes.outputs.ts}}
+      deno: ${{steps.changes.outputs.deno}}
+      flake: ${{steps.changes.outputs.flake}}
+      renovate: ${{steps.changes.outputs.renovate}}
+      # keep-sorted end
     runs-on: ubuntu-latest
     permissions: {}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
       - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
         id: changes
         with:
           filters: |
-            markdown:
-              - ./**/*.md
+            flake:
+              - flake.nix
+              - flake.lock
+            renovate:
+              - renovate.json5
             actions:
               - .github/workflows/*.yml
               - .github/workflows/*.yaml
-              - aqua.yaml
-            ts:
-              - .github/workflows/push.yml
-              - .github/workflows/_check-deno.yml
+            deno:
               - ./**/*.ts
-              - deno.jsonc
-  check-markdown:
+  check-format:
     needs: path-filter
-    if: needs.path-filter.outputs.markdown == 'true'
-    uses: ./.github/workflows/_check-markdown.yml
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
     permissions: {}
-    with:
-      globs: "./**/*.md"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Install nix
+        uses: cachix/install-nix-action@fc6e360bedc9ee72d75e701397f0bb30dce77568 # v31.5.2
+        with:
+          nix_path: nixpkgs=https://github.com/NixOS/nixpkgs/archive/refs/heads/nixpkgs-unstable.tar.gz
+          extra_nix_config: |
+            experimental-features = nix-command flakes pipe-operators
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+      - run: nix flake check
   check-actions:
     needs: path-filter
-    if: needs.path-filter.outputs.actions == 'true'
-    uses: ./.github/workflows/_check-actions.yml
-    permissions:
-      contents: read
+    if: needs.path-filter.outputs.actions == 'true' || needs.path-filter.outputs.flake == 'true'
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Install nix
+        uses: cachix/install-nix-action@fc6e360bedc9ee72d75e701397f0bb30dce77568 # v31.5.2
+        with:
+          nix_path: nixpkgs=https://github.com/NixOS/nixpkgs/archive/refs/heads/nixpkgs-unstable.tar.gz
+          extra_nix_config: |
+            experimental-features = nix-command flakes pipe-operators
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+      - run: nix run .#check-actions
   check-deno:
     needs: path-filter
-    if: needs.path-filter.outputs.ts == 'true'
-    uses: ./.github/workflows/_check-deno.yml
-    permissions:
-      contents: read
+    if: needs.path-filter.outputs.deno == 'true' || needs.path-filter.outputs.flake == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions: {}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Install nix
+        uses: cachix/install-nix-action@fc6e360bedc9ee72d75e701397f0bb30dce77568 # v31.5.2
+        with:
+          nix_path: nixpkgs=https://github.com/NixOS/nixpkgs/archive/refs/heads/nixpkgs-unstable.tar.gz
+          extra_nix_config: |
+            experimental-features = nix-command flakes pipe-operators
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+      - run: nix run .#check-deno
+  check-renovate-config:
+    needs: path-filter
+    if: needs.path-filter.outputs.renovate == 'true' || needs.path-filter.outputs.flake == 'true'
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Install nix
+        uses: cachix/install-nix-action@fc6e360bedc9ee72d75e701397f0bb30dce77568 # v31.5.2
+        with:
+          nix_path: nixpkgs=https://github.com/NixOS/nixpkgs/archive/refs/heads/nixpkgs-unstable.tar.gz
+          extra_nix_config: |
+            experimental-features = nix-command flakes pipe-operators
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+      - name: Validate renovate config
+        run: nix run .#check-renovate-config
+  status-check:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    needs:
+      - check-format
+      - check-actions
+      - check-deno
+      - check-renovate-config
+    permissions: {}
+    if: failure()
+    steps:
+      - run: exit 1
